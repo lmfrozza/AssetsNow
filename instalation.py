@@ -18,7 +18,9 @@ def Config_Folder_Appdata():
     if(Verify_Folder_userdb):
         dados = [
         ["API", "User", "Senha", "Chave"],
-        ["ExchangeRate-API","","",""]
+        ["ExchangeRate","null_str","null_str","null_str"],
+        ["coinmarketcap", "null_str", "null_str", "null_str"],
+        ["Ibovespa", "null_str", "null_str", "null_str"]
         ]   
 
         # Nome do arquivo CSV
