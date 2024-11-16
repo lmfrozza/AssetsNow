@@ -214,5 +214,17 @@ def toggle_Forms_API(row):
 interactive_frame = ctk.CTkFrame(app, width=300, height=600,fg_color="#303030")
 interactive_frame.pack(side="left")
 
+Btn_Cotacao_Monetaria = ctk.CTkButton(interactive_frame, text="Cotação Monetária",width=180, height=50, fg_color="#1b74c1")
+Btn_Cotacao_Monetaria.place(relx=0.5, rely=0.15, anchor='center')
+
+Btn_Cotacao_Cripto = ctk.CTkButton(interactive_frame, text="Cotação Criptoativos",width=180, height=50, fg_color="#1b74c1")
+Btn_Cotacao_Cripto.place(relx=0.5, rely=0.35, anchor='center')
+
+Btn_Ibovespa = ctk.CTkButton(interactive_frame, text="Ibovespa [B3]",width=180, height=50, fg_color="#1b74c1")
+Btn_Ibovespa.place(relx=0.5, rely=0.55, anchor='center')
+
+Btn_Terminal = ctk.CTkButton(interactive_frame, text="Custom Application Terminal",width=180, height=50, fg_color="#1b74c1")
+Btn_Terminal.place(relx=0.5, rely=0.75, anchor='center')
+
 
 app.mainloop()
