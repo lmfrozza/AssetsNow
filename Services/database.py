@@ -8,7 +8,7 @@ def Read_Database(db):
 
 
     caminho_arquivo = os.path.join(user_profile, "AppData", "Roaming", "AssetsNow", f"{db}.csv")
-    print(caminho_arquivo)
+    #print(caminho_arquivo)
     try:
         # Lê o arquivo CSV
         df = pd.read_csv(caminho_arquivo)
