@@ -15,7 +15,7 @@ def Config_Folder_Appdata():
     else:
         print(f"A pasta '{appdata_folder}' já existe.")
 
-    if(Verify_Folder_userdb):
+    if(not Verify_Folder_userdb):
         dados = [
         ["API", "User", "Senha", "Chave"],
         ["ExchangeRate","null_str","null_str","null_str"],
@@ -32,6 +32,24 @@ def Config_Folder_Appdata():
             
             # Escrevendo os dados no arquivo CSV
             escritor_csv.writerows(dados)
+
+        print(f"Arquivo '{nome_arquivo}' criado com sucesso!")
+    
+    if( not Verify_pcongif()):
+        config = [
+            ["theme", "cottype"],
+            ["dark","null_str"]
+        ]   
+
+        # Nome do arquivo CSV
+        nome_arquivo = f"{appdata_folder}/pconfig.csv"
+
+        # Abrindo o arquivo em modo de escrita ('w')
+        with open(nome_arquivo, mode='w', newline='', encoding='utf-8') as arquivo_csv:
+            escritor_csv = csv.writer(arquivo_csv)
+            
+            # Escrevendo os dados no arquivo CSV
+            escritor_csv.writerows(config)
 
         print(f"Arquivo '{nome_arquivo}' criado com sucesso!")
         
@@ -62,5 +80,18 @@ def Verify_Folder_userdb():
     else:
         return True
     
+def Verify_pcongif():
+    user_profile = os.environ['USERPROFILE']
 
 
+    appdata_folder = os.path.join(user_profile, "AppData", "Roaming", "AssetsNow", "pconfig.csv")
+    
+    if not os.path.exists(appdata_folder):
+        return False
+    else:
+        return True
+
+
+if __name__ == "__main__":
+    print(Verify_pcongif())
+    print(Verify_Folder_userdb())

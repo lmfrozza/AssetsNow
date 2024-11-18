@@ -1,8 +1,30 @@
+#SERVICES IMPORT
+
 import customtkinter as ctk
-from instalation import Config_Folder_Appdata, Verify_Folder, Verify_Folder_userdb
-from database import Read_API_Database, Patch_DB
+from Services.instalation import Config_Folder_Appdata, Verify_Folder, Verify_Folder_userdb, Verify_pcongif
+from Services.database import Read_Database, Patch_DB, Patch_pConfig
 import webbrowser
-ctk.set_appearance_mode("dark") 
+
+#TEMPLATES IMPORT
+
+try:
+    theme = Read_Database("pconfig").loc[0, 'theme']
+    print(theme)
+except:
+    theme = 'light'
+
+DarkColors = ["#303030"]
+LightColors = ["#f1f1f1"]
+
+if(theme == 'dark'):
+    Theme_Colors  = DarkColors
+elif(theme == 'light'):
+    Theme_Colors = LightColors
+else:
+    print(f"Theme do app: {theme}")
+    Theme_Colors = DarkColors
+
+ctk.set_appearance_mode(theme) 
 ctk.set_default_color_theme("blue") 
 
 
@@ -13,7 +35,7 @@ app.title("AssetsNow | Facilite suas aplicações financeiras! ")
 #INICIALIZA O BANCO DE DADOS
 if(Verify_Folder_userdb()):
     print("Inicializando o Banco de dados...")
-    db = Read_API_Database()
+    db = Read_Database("apikeys")
     print(db)
 else:
     print("Falha ao iniciar o banco de dados")
@@ -22,7 +44,7 @@ header_frame = ctk.CTkFrame(app, fg_color="#1b74c1")
 header_frame.pack(side="top", fill="x")
 
 #HEADER H2
-header_label = ctk.CTkLabel(header_frame, text="AssetsNow", font=("Arial", 16))
+header_label = ctk.CTkLabel(header_frame, text="AssetsNow", font=("Arial", 16), text_color="#fff")
 header_label.pack(side="left", padx=40, pady=10) 
 
 
@@ -61,13 +83,38 @@ def toggle_menu_config():
         menu_frame.place(relx=1.5, rely=0, anchor='ne')  
 
 
-menu_frame = ctk.CTkFrame(app, width=300, height=600,fg_color="#303030")
+menu_frame = ctk.CTkFrame(app, width=300, height=600,fg_color=Theme_Colors[0])
 menu_frame.place(relx=1.5, rely=0, anchor='ne')
 menu_frame_header = ctk.CTkFrame(menu_frame, width=300, height=30, fg_color="#1b74c1")
 menu_frame_header.place(relx=1.0, rely=0.0001, anchor='ne')
 
-menu_frame_header_title = ctk.CTkLabel(menu_frame_header, text="Configurações", font=("Arial", 16))
+menu_frame_header_title = ctk.CTkLabel(menu_frame_header, text="Configurações", font=("Arial", 16), text_color="#fff")
 menu_frame_header_title.place(relx=0.5, rely=0.5, anchor='center')
+
+theme_options = ["dark", "light", "system"]
+
+option_menu_label = ctk.CTkLabel(menu_frame, text="Cor do sistema: ").place(relx=0.03, rely=0.1, anchor='w')
+option_menu = ctk.CTkOptionMenu(menu_frame, values=theme_options)
+option_menu.place(relx=0.7, rely=0.1, anchor='center')
+
+
+option_menu_label = ctk.CTkLabel(menu_frame, text="Buscar por:").place(relx=0.03, rely=0.2, anchor='w')
+cot_option = ctk.CTkOptionMenu(menu_frame, values=["Mapeadas", "Código de moeda"])
+cot_option.place(relx=0.7, rely=0.2, anchor='center')
+
+
+pconfig_Patch_Button = ctk.CTkButton(menu_frame, text="Salvar", command=lambda: Salva_pConfig(), fg_color="#1b74c1", text_color="white", hover_color="#3b74c9")
+pconfig_Patch_Button.place(relx=0.5, rely=0.9,anchor="s")
+
+def Salva_pConfig():
+    Patch_Theme = str(option_menu.get())
+    Patch_Cot = str(cot_option.get())
+    print(Patch_pConfig(
+        Read_Database("pconfig"),
+        Patch_Theme,
+        Patch_Cot
+    ))
+
 #INSTALL TOOGLE
 
 def toggle_menu_Install():
@@ -83,12 +130,12 @@ def toggle_menu_Install():
         install_frame.place(relx=1.5, rely=0, anchor='ne')
 
 
-install_frame = ctk.CTkFrame(app, width=300, height=600,fg_color="#303030")
+install_frame = ctk.CTkFrame(app, width=300, height=600,fg_color=Theme_Colors[0])
 install_frame.place(relx=1.5, rely=0, anchor='ne')  
 install_frame_header = ctk.CTkFrame(install_frame, width=300, height=30, fg_color="#1b74c1")
 install_frame_header.place(relx=1.0, rely=0.0001, anchor='ne')
 
-install_frame_header_title = ctk.CTkLabel(install_frame_header, text="Instalação", font=("Arial", 16))
+install_frame_header_title = ctk.CTkLabel(install_frame_header, text="Instalação", font=("Arial", 16), text_color="#fff")
 install_frame_header_title.place(relx=0.5, rely=0.5, anchor='center')
 
 install_frame_Env_Button = ctk.CTkButton(install_frame, text="Instalar", command=lambda: Config_Folder_Appdata(), fg_color="#1b74c1", text_color="white", hover_color="#3b74c9")
@@ -108,6 +155,13 @@ def CheckList():
         emoji = "☒"
     install_frame_checklist_2 = ctk.CTkLabel(install_frame, text=f"CSV API Keys {emoji}", font=("Arial", 16))
     install_frame_checklist_2.place(relx=0.5, rely=0.35, anchor='center')
+    if(Verify_pcongif()):
+        emoji = "✅"
+    else:
+        emoji = "☒"
+    install_frame_checklist_2 = ctk.CTkLabel(install_frame, text=f"CSV Config Pessoal {emoji}", font=("Arial", 16))
+    install_frame_checklist_2.place(relx=0.5, rely=0.5, anchor='center')
+
 
 
 
@@ -124,12 +178,12 @@ def toggle_menu_APIs():
         api_frame.place(relx=1.5, rely=0, anchor='ne')
 
 
-api_frame = ctk.CTkFrame(app, width=300, height=600,fg_color="#303030")
+api_frame = ctk.CTkFrame(app, width=300, height=600,fg_color=Theme_Colors[0])
 api_frame.place(relx=1.5, rely=0, anchor='ne')  
 api_frame_header = ctk.CTkFrame(api_frame, width=300, height=30, fg_color="#1b74c1")
 api_frame_header.place(relx=1.0, rely=0.0001, anchor='ne')
 
-api_frame_header_title = ctk.CTkLabel(api_frame_header, text="Chaves de API", font=("Arial", 16))
+api_frame_header_title = ctk.CTkLabel(api_frame_header, text="Chaves de API", font=("Arial", 16), text_color="#fff")
 api_frame_header_title.place(relx=0.5, rely=0.5, anchor='center')
 
 
@@ -156,10 +210,10 @@ def Patch_Forms(row):
             api_frame_Next_Button = ctk.CTkButton(api_frame, text="→", width=50, command=lambda: toggle_Forms_API(row + 1), fg_color="#1b74c1", text_color="white", hover_color="#3b74c9")
             api_frame_Next_Button.place(relx=0.8, rely=0.07, anchor="nw")
         if(Verify_Folder_userdb):
-            API = Read_API_Database().loc[row, "API"]
-            USER = Read_API_Database().loc[row, "User"]
-            SENHA = Read_API_Database().loc[row, "Senha"]
-            CHAVE = Read_API_Database().loc[row, "Chave"]
+            API = Read_Database("apikeys").loc[row, "API"]
+            USER = Read_Database("apikeys").loc[row, "User"]
+            SENHA = Read_Database("apikeys").loc[row, "Senha"]
+            CHAVE = Read_Database("apikeys").loc[row, "Chave"]
             api_frame_Api_Name = ctk.CTkLabel(api_frame, text=API, font=("Arial", 16))
             api_frame_Api_Name.place(relx=0.5, rely=0.09, anchor='center')
 
@@ -182,7 +236,8 @@ def Patch_Forms(row):
             Patch_Senha = str(entry_pword.get())
             Patch_Chave = str(entry_key.get())
             print(Patch_DB(
-                Read_API_Database(), 
+                "apikeys",
+                Read_Database("apikeys"), 
                 row,
                 Patch_User, 
                 Patch_Senha, 
@@ -211,7 +266,7 @@ def toggle_Forms_API(row):
     
 
 #/-----------------/Interactive Menu\-----------------\
-interactive_frame = ctk.CTkFrame(app, width=300, height=600,fg_color="#303030")
+interactive_frame = ctk.CTkFrame(app, width=300, height=600,fg_color=Theme_Colors[0])
 interactive_frame.pack(side="left")
 
 Btn_Cotacao_Monetaria = ctk.CTkButton(interactive_frame, text="Cotação Monetária",width=180, height=50, fg_color="#1b74c1")
