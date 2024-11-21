@@ -1,3 +1,8 @@
+import sys
+import os
+
+# Adiciona o diretório pai ao sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import os
 import csv
 
@@ -15,7 +20,7 @@ def Config_Folder_Appdata():
     else:
         print(f"A pasta '{appdata_folder}' já existe.")
 
-    if(not Verify_Folder_userdb):
+    if(not Verify_Folder_userdb()):
         dados = [
         ["API", "User", "Senha", "Chave"],
         ["ExchangeRate","null_str","null_str","null_str"],
@@ -34,7 +39,8 @@ def Config_Folder_Appdata():
             escritor_csv.writerows(dados)
 
         print(f"Arquivo '{nome_arquivo}' criado com sucesso!")
-    
+    else:
+        print("Pasta apis já existe: {}".format(Verify_Folder_userdb()))
     if( not Verify_pcongif()):
         config = [
             ["theme", "cottype"],
@@ -52,7 +58,6 @@ def Config_Folder_Appdata():
             escritor_csv.writerows(config)
 
         print(f"Arquivo '{nome_arquivo}' criado com sucesso!")
-        
 
 
 #Verifica se o Folder existe
@@ -95,3 +100,4 @@ def Verify_pcongif():
 if __name__ == "__main__":
     print(Verify_pcongif())
     print(Verify_Folder_userdb())
+    Config_Folder_Appdata()

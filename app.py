@@ -2,13 +2,18 @@
 
 import customtkinter as ctk
 from Services.instalation import Config_Folder_Appdata, Verify_Folder, Verify_Folder_userdb, Verify_pcongif
-from Services.database import Read_Database, Patch_DB, Patch_pConfig
+from Services.database import Database 
 import webbrowser
 
+
 #TEMPLATES IMPORT
+from Templates.CoM import CM_Screen
+from Templates.CoC import CC_Screen
+from Templates.B3 import B3_Screen
+from Templates.cat import Cat_Screen
 
 try:
-    theme = Read_Database("pconfig").loc[0, 'theme']
+    theme = Database.Read_Database("pconfig").loc[0, 'theme']
     print(theme)
 except:
     theme = 'light'
@@ -31,11 +36,12 @@ ctk.set_default_color_theme("blue")
 app = ctk.CTk()
 app.geometry("1200x600")
 app.title("AssetsNow | Facilite suas aplicações financeiras! ")
+app.resizable(False, False)
 
 #INICIALIZA O BANCO DE DADOS
 if(Verify_Folder_userdb()):
     print("Inicializando o Banco de dados...")
-    db = Read_Database("apikeys")
+    db = Database.Read_Database("apikeys")
     print(db)
 else:
     print("Falha ao iniciar o banco de dados")
@@ -77,7 +83,8 @@ def toggle_menu_config():
     api_frame.place(relx=1.5, rely=0, anchor='ne')
 
     if menu_frame.winfo_x() > app.winfo_width(): 
-        menu_frame.place(relx=1, rely=0.08, anchor='ne')  
+        menu_frame.place(relx=1, rely=0.08, anchor='ne')
+        menu_frame.lift()
         
     else:
         menu_frame.place(relx=1.5, rely=0, anchor='ne')  
@@ -109,8 +116,8 @@ pconfig_Patch_Button.place(relx=0.5, rely=0.9,anchor="s")
 def Salva_pConfig():
     Patch_Theme = str(option_menu.get())
     Patch_Cot = str(cot_option.get())
-    print(Patch_pConfig(
-        Read_Database("pconfig"),
+    print(Database.Patch_pConfig(
+        Database.Read_Database("pconfig"),
         Patch_Theme,
         Patch_Cot
     ))
@@ -125,7 +132,7 @@ def toggle_menu_Install():
     if install_frame.winfo_x() > app.winfo_width():  
         CheckList()
         install_frame.place(relx=1.0, rely=0.08, anchor='ne')  # Posiciona o frame na tela
-
+        install_frame.lift()
     else:
         install_frame.place(relx=1.5, rely=0, anchor='ne')
 
@@ -174,6 +181,7 @@ def toggle_menu_APIs():
     if api_frame.winfo_x() > app.winfo_width():
         Patch_Forms(0)
         api_frame.place(relx=1.0, rely=0.08, anchor='ne')  # Posiciona o frame na tela
+        api_frame.lift()
     else:
         api_frame.place(relx=1.5, rely=0, anchor='ne')
 
@@ -210,10 +218,10 @@ def Patch_Forms(row):
             api_frame_Next_Button = ctk.CTkButton(api_frame, text="→", width=50, command=lambda: toggle_Forms_API(row + 1), fg_color="#1b74c1", text_color="white", hover_color="#3b74c9")
             api_frame_Next_Button.place(relx=0.8, rely=0.07, anchor="nw")
         if(Verify_Folder_userdb):
-            API = Read_Database("apikeys").loc[row, "API"]
-            USER = Read_Database("apikeys").loc[row, "User"]
-            SENHA = Read_Database("apikeys").loc[row, "Senha"]
-            CHAVE = Read_Database("apikeys").loc[row, "Chave"]
+            API = Database.Read_Database("apikeys").loc[row, "API"]
+            USER = Database.Read_Database("apikeys").loc[row, "User"]
+            SENHA = Database.Read_Database("apikeys").loc[row, "Senha"]
+            CHAVE = Database.Read_Database("apikeys").loc[row, "Chave"]
             api_frame_Api_Name = ctk.CTkLabel(api_frame, text=API, font=("Arial", 16))
             api_frame_Api_Name.place(relx=0.5, rely=0.09, anchor='center')
 
@@ -235,9 +243,9 @@ def Patch_Forms(row):
             Patch_User = str(entry_user.get())
             Patch_Senha = str(entry_pword.get())
             Patch_Chave = str(entry_key.get())
-            print(Patch_DB(
+            print(Database.Patch_DB(
                 "apikeys",
-                Read_Database("apikeys"), 
+                Database.Read_Database("apikeys"), 
                 row,
                 Patch_User, 
                 Patch_Senha, 
@@ -260,25 +268,27 @@ def toggle_Forms_API(row):
     # Posiciona o frame na tela
     api_frame.place(relx=1.0, rely=0.08, anchor='ne')
 
-
-    
+#/-----------------/DIV Menu operacional\-----------------\
+ope_frame = ctk.CTkFrame(app, width=895, height=600)#,fg_color="#fff")
+ope_frame.pack(side="right")   
 
     
 
 #/-----------------/Interactive Menu\-----------------\
+           
 interactive_frame = ctk.CTkFrame(app, width=300, height=600,fg_color=Theme_Colors[0])
 interactive_frame.pack(side="left")
 
-Btn_Cotacao_Monetaria = ctk.CTkButton(interactive_frame, text="Cotação Monetária",width=180, height=50, fg_color="#1b74c1")
+Btn_Cotacao_Monetaria = ctk.CTkButton(interactive_frame, text="Cotação Monetária",command=lambda:CM_Screen.Main(ope_frame),width=180, height=50, fg_color="#1b74c1")
 Btn_Cotacao_Monetaria.place(relx=0.5, rely=0.15, anchor='center')
 
-Btn_Cotacao_Cripto = ctk.CTkButton(interactive_frame, text="Cotação Criptoativos",width=180, height=50, fg_color="#1b74c1")
+Btn_Cotacao_Cripto = ctk.CTkButton(interactive_frame, text="Cotação Criptoativos",command=lambda:CC_Screen.Main(ope_frame),width=180, height=50, fg_color="#1b74c1")
 Btn_Cotacao_Cripto.place(relx=0.5, rely=0.35, anchor='center')
 
-Btn_Ibovespa = ctk.CTkButton(interactive_frame, text="Ibovespa [B3]",width=180, height=50, fg_color="#1b74c1")
+Btn_Ibovespa = ctk.CTkButton(interactive_frame, text="Ibovespa [B3]",command=lambda:B3_Screen.Main(ope_frame),width=180, height=50, fg_color="#1b74c1")
 Btn_Ibovespa.place(relx=0.5, rely=0.55, anchor='center')
 
-Btn_Terminal = ctk.CTkButton(interactive_frame, text="Custom Application Terminal",width=180, height=50, fg_color="#1b74c1")
+Btn_Terminal = ctk.CTkButton(interactive_frame, text="Custom Application Terminal",command=lambda:Cat_Screen.Main(ope_frame),width=180, height=50, fg_color="#1b74c1")
 Btn_Terminal.place(relx=0.5, rely=0.75, anchor='center')
 
 
